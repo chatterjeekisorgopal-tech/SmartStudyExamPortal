@@ -210,3 +210,26 @@ Start Examination
 </button>
 
 </div>
+  <script>
+
+function startExam() {
+
+    let name = document.getElementById("name").value;
+    let roll = document.getElementById("roll").value;
+    let teacher = document.getElementById("teacher").value;
+    let batch = document.getElementById("batch").value;
+    let accessCode = document.getElementById("accessCode").value;
+
+    if(name=="" || roll=="" || teacher=="" || batch=="" || accessCode==""){
+        alert("সব তথ্য পূরণ করুন");
+        return;
+    }
+
+    alert("পরীক্ষা শুরু হবে");
+
+}
+
+</script>
+
+</body>
+</html>
