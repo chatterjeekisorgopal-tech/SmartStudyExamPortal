@@ -253,111 +253,187 @@ let questions = [];
 let currentQuestion = 0;
 let score = 0;
 
-function startExam() {
+let timeLeft = 3000; // 50 minutes
+let timer;
+let startTime;
 
-    let name = document.getElementById("name").value;
-    let roll = document.getElementById("roll").value;
-    let teacher = document.getElementById("teacher").value;
-    let batch = document.getElementById("batch").value;
-    let accessCode = document.getElementById("accessCode").value;
+function startExam(){
 
-    if(name=="" || roll=="" || teacher=="" || batch=="" || accessCode==""){
-    alert("সব তথ্য পূরণ করুন");
-    return;
+let name = document.getElementById("name").value;
+let roll = document.getElementById("roll").value;
+let teacher = document.getElementById("teacher").value;
+let batch = document.getElementById("batch").value;
+let accessCode = document.getElementById("accessCode").value;
+
+if(name=="" || roll=="" || teacher=="" || batch=="" || accessCode==""){
+alert("সব তথ্য পূরণ করুন");
+return;
 }
 
 if(accessCode !== "SMART2026"){
-    alert("ভুল Access Code");
-    return;
+alert("ভুল Access Code");
+return;
 }
 
-    fetch(SHEET_API)
-    .then(response => response.json())
-    .then(data => {
+startTime = new Date();
 
-        questions = data;
+startTimer();
 
-        document.getElementById("studentForm").style.display = "none";
-        document.getElementById("examSection").style.display = "block";
+fetch(SHEET_API)
+.then(res => res.json())
+.then(data=>{
 
-        loadQuestion();
+questions = data;
 
-    })
-    .catch(error => {
-        alert("Question Loading Failed");
-        console.log(error);
-    });
+document.getElementById("studentForm").style.display="none";
+document.getElementById("examSection").style.display="block";
+
+loadQuestion();
+
+})
+.catch(err=>{
+alert("Question Loading Failed");
+console.log(err);
+});
+
+}
+
+function startTimer(){
+
+timer = setInterval(()=>{
+
+let minutes = Math.floor(timeLeft/60);
+let seconds = timeLeft%60;
+
+document.getElementById("timer").innerHTML =
+String(minutes).padStart(2,'0') + ":" +
+String(seconds).padStart(2,'0');
+
+timeLeft--;
+
+if(timeLeft < 0){
+
+clearInterval(timer);
+
+alert("সময় শেষ");
+
+submitExam();
+
+}
+
+},1000);
 
 }
 
 function loadQuestion(){
 
-    if(currentQuestion >= questions.length){
-        submitExam();
-        return;
-    }
+if(currentQuestion >= questions.length){
+submitExam();
+return;
+}
 
-    let q = questions[currentQuestion];
+let q = questions[currentQuestion];
 
-    document.getElementById("questionNumber").innerHTML =
-        "Question " + (currentQuestion + 1) + " of " + questions.length;
+document.getElementById("questionNumber").innerHTML =
+"Question " + (currentQuestion+1) +
+" of " + questions.length;
 
-    document.getElementById("questionText").innerHTML = q[0];
+document.getElementById("questionText").innerHTML =
+q[0];
 
-    document.getElementById("optionsArea").innerHTML = `
-        <label class="option">
-        <input type="radio" name="answer" value="A"> ${q[1]}
-        </label>
+document.getElementById("optionsArea").innerHTML = `
 
-        <label class="option">
-        <input type="radio" name="answer" value="B"> ${q[2]}
-        </label>
+<label class="option">
+<input type="radio" name="answer" value="A">
+${q[1]}
+</label>
 
-        <label class="option">
-        <input type="radio" name="answer" value="C"> ${q[3]}
-        </label>
+<label class="option">
+<input type="radio" name="answer" value="B">
+${q[2]}
+</label>
 
-        <label class="option">
-        <input type="radio" name="answer" value="D"> ${q[4]}
-        </label>
+<label class="option">
+<input type="radio" name="answer" value="C">
+${q[3]}
+</label>
 
-        <button class="submit-btn" onclick="nextQuestion()">
-        Next Question
-        </button>
-    `;
+<label class="option">
+<input type="radio" name="answer" value="D">
+${q[4]}
+</label>
+
+<button class="submit-btn" onclick="nextQuestion()">
+Next Question
+</button>
+
+`;
 
 }
 
 function nextQuestion(){
 
-    let selected =
-        document.querySelector('input[name="answer"]:checked');
+let selected =
+document.querySelector('input[name="answer"]:checked');
 
-    if(!selected){
-        alert("একটি উত্তর নির্বাচন করুন");
-        return;
-    }
+if(!selected){
+alert("একটি উত্তর নির্বাচন করুন");
+return;
+}
 
-    let correctAnswer = questions[currentQuestion][5];
+let correctAnswer =
+questions[currentQuestion][5];
 
-    if(selected.value === correctAnswer){
-        score++;
-    }
+if(selected.value === correctAnswer){
+score++;
+}
 
-    currentQuestion++;
+currentQuestion++;
 
-    loadQuestion();
+loadQuestion();
 
 }
 
 function submitExam(){
 
-    document.getElementById("examSection").style.display = "none";
+clearInterval(timer);
 
-    document.getElementById("resultBox").style.display = "block";
+let endTime = new Date();
 
-    document.getElementById("finalScore").innerHTML =
-        score + " / " + questions.length;
+let usedMinutes =
+Math.floor((endTime-startTime)/60000);
+
+let finalMarks =
+Math.round((score/questions.length)*50);
+
+document.getElementById("examSection").style.display="none";
+
+document.getElementById("resultBox").style.display="block";
+
+document.getElementById("finalScore").innerHTML =
+finalMarks + "/50<br><br>Time Used : " +
+usedMinutes + " Minute";
+
+let resultData = {
+
+name:document.getElementById("name").value,
+roll:document.getElementById("roll").value,
+teacher:document.getElementById("teacher").value,
+batch:document.getElementById("batch").value,
+timeUsed:usedMinutes,
+score:finalMarks,
+accessCode:document.getElementById("accessCode").value,
+examDate:new Date().toLocaleDateString()
+
+};
+
+fetch(SHEET_API,{
+method:"POST",
+body:JSON.stringify(resultData)
+})
+.then(res=>res.text())
+.then(data=>console.log(data))
+.catch(err=>console.log(err));
 
 }
 
