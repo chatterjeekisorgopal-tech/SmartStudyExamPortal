@@ -262,9 +262,14 @@ function startExam() {
     let accessCode = document.getElementById("accessCode").value;
 
     if(name=="" || roll=="" || teacher=="" || batch=="" || accessCode==""){
-        alert("সব তথ্য পূরণ করুন");
-        return;
-    }
+    alert("সব তথ্য পূরণ করুন");
+    return;
+}
+
+if(accessCode !== "SMART2026"){
+    alert("ভুল Access Code");
+    return;
+}
 
     fetch(SHEET_API)
     .then(response => response.json())
