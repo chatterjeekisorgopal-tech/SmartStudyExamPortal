@@ -212,7 +212,7 @@ Start Examination
 </div>
   <div class="exam-section" id="examSection">
 
-<div class="timer" id="timer">50:00</div>
+<div class="timer" id="timer">40:00</div>
 
 <div class="question-box">
 
@@ -253,7 +253,7 @@ let questions = [];
 let currentQuestion = 0;
 let score = 0;
 
-let timeLeft = 3000; // 50 minutes
+let timeLeft = 2400; // 40 minutes
 let timer;
 let startTime;
 
@@ -341,34 +341,24 @@ document.getElementById("questionNumber").innerHTML =
 document.getElementById("questionText").innerHTML =
 q[0];
 
-document.getElementById("optionsArea").innerHTML = `
+const radios =
+document.querySelectorAll('input[name="answer"]');
 
-<label class="option">
-<input type="radio" name="answer" value="A">
-${q[1]}
-</label>
+radios.forEach(radio => {
 
-<label class="option">
-<input type="radio" name="answer" value="B">
-${q[2]}
-</label>
+radio.addEventListener("change", function(){
 
-<label class="option">
-<input type="radio" name="answer" value="C">
-${q[3]}
-</label>
+radios.forEach(r => {
 
-<label class="option">
-<input type="radio" name="answer" value="D">
-${q[4]}
-</label>
+if(r !== this){
+r.disabled = true;
+}
 
-<button class="submit-btn" onclick="nextQuestion()">
-Next Question
-</button>
+});
 
-`;
+});
 
+});
 }
 
 function nextQuestion(){
