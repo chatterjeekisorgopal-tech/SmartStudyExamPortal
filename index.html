@@ -394,15 +394,16 @@ let usedMinutes =
 Math.floor((endTime-startTime)/60000);
 
 let finalMarks =
-Math.round((score/questions.length)*50);
+let finalMarks = score;
 
 document.getElementById("examSection").style.display="none";
 
 document.getElementById("resultBox").style.display="block";
 
 document.getElementById("finalScore").innerHTML =
-finalMarks + "/50<br><br>Time Used : " +
-usedMinutes + " Minute";
+finalMarks + "/50" +
+"<br><br>Time Used : " + usedMinutes + " Minute" +
+"<br><br>Total Exam Time : 40 Minutes";
 
 let resultData = {
 
@@ -428,3 +429,5 @@ body:JSON.stringify(resultData)
 }
 
 </script>
+  </body>
+</html>
