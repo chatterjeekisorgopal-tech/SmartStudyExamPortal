@@ -212,8 +212,7 @@ Start Examination
 
 <div class="exam-section" id="examSection">
 
-<div class="timer" id="timer">
-40:00
+<div class="timer" id="timer">25:00</div>
 </div>
 
 <div class="question-box">
@@ -253,7 +252,7 @@ let questions = [];
 let currentQuestion = 0;
 let score = 0;
 
-let timeLeft = 2400; // 40 Minutes
+let timeLeft = 1500; // 25 minutes
 let timer;
 let startTime;
 
@@ -447,7 +446,8 @@ document.getElementById("resultBox").style.display = "block";
 
 document.getElementById("finalScore").innerHTML =
 "Time Used : " + usedMinutes + " Minute" +
-"<br><br>Total Exam Time : 40 Minutes";
+"<br><br>Total Exam Time : 25 Minutes" +
+"<br><br><b>Thank You For Participating In The Examination</b>";
 
 let resultData = {
 
