@@ -464,14 +464,17 @@ examDate: new Date().toLocaleDateString()
 
 fetch(SHEET_API,{
 method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
 body:JSON.stringify(resultData)
 })
 .then(res => res.text())
-.then(data => console.log(data))
-.catch(err => console.log(err));
+.then(data => {
+console.log("SUCCESS:", data);
+alert("Result Saved Successfully");
+})
+.catch(err => {
+console.log("ERROR:", err);
+alert("Result Save Failed");
+});
 
 }
   </script>
