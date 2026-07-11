@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -35,7 +36,7 @@ margin-bottom:10px;
 
 .hero p{
 font-size:18px;
-opacity:0.9;
+opacity:.9;
 }
 
 .container{
@@ -70,19 +71,24 @@ border-radius:8px;
 font-size:15px;
 }
 
-.start-btn{
+.start-btn,
+.submit-btn{
 width:100%;
-background:#1e3c72;
-color:white;
 border:none;
 padding:15px;
 font-size:18px;
 border-radius:10px;
 cursor:pointer;
+color:white;
 }
 
-.start-btn:hover{
-background:#16315d;
+.start-btn{
+background:#1e3c72;
+}
+
+.submit-btn{
+background:#28a745;
+margin-top:20px;
 }
 
 .exam-section{
@@ -132,16 +138,12 @@ text-align:center;
 margin-top:15px;
 }
 
-.submit-btn{
-width:100%;
-margin-top:20px;
-background:#28a745;
-color:white;
-border:none;
-padding:15px;
-font-size:18px;
-border-radius:10px;
-cursor:pointer;
+.notice{
+background:#fff3cd;
+padding:12px;
+border-radius:8px;
+margin-bottom:15px;
+font-weight:bold;
 }
 
 .result-box{
@@ -154,10 +156,6 @@ text-align:center;
 box-shadow:0 5px 20px rgba(0,0,0,.08);
 }
 
-.result-box h2{
-margin-bottom:15px;
-}
-
 .score{
 font-size:40px;
 font-weight:bold;
@@ -165,8 +163,8 @@ color:#1e3c72;
 }
 
 </style>
-</head>
 
+</head>
 <body>
 
 <div class="hero">
@@ -178,10 +176,11 @@ color:#1e3c72;
 
 <div class="card" id="studentForm">
 
-<h2 style="margin-bottom:20px;">Student Information</h2>
+<h2>Student Information</h2>
+<br>
 
 <div class="form-group">
-<label>Student's Name</label>
+<label>Student Name</label>
 <input type="text" id="name">
 </div>
 
@@ -191,7 +190,7 @@ color:#1e3c72;
 </div>
 
 <div class="form-group">
-<label>Teacher's Name</label>
+<label>Teacher Name</label>
 <input type="text" id="teacher">
 </div>
 
@@ -210,14 +209,21 @@ Start Examination
 </button>
 
 </div>
-  <div class="exam-section" id="examSection">
 
-<div class="timer" id="timer">40:00</div>
+<div class="exam-section" id="examSection">
+
+<div class="timer" id="timer">
+40:00
+</div>
 
 <div class="question-box">
 
+<div class="notice">
+One option can be selected and cannot be changed.
+</div>
+
 <div class="question-number" id="questionNumber">
-Question 1 of 20
+Question
 </div>
 
 <div class="question-text" id="questionText">
@@ -225,10 +231,6 @@ Loading...
 </div>
 
 <div id="optionsArea"></div>
-
-<button class="submit-btn" onclick="submitExam()">
-Submit Exam
-</button>
 
 </div>
 
@@ -238,22 +240,20 @@ Submit Exam
 
 <h2>Exam Completed</h2>
 
-<p>Your Score</p>
-
 <div class="score" id="finalScore">
 0 / 50
 </div>
 
 </div>
- <script>
 
-const SHEET_API = "https://script.google.com/macros/s/AKfycbzR9DaZxMHdG7kOTqC0iAp7TzaulQ89HdTe9oh9Ju5cf3OMRE0e3C15G1_2c0NLS4BJTA/exec";
+<script>
+  const SHEET_API = "https://script.google.com/macros/s/AKfycbzR9DaZxMHdG7kOTqC0iAp7TzaulQ89HdTe9oh9Ju5cf3OMRE0e3C15G1_2c0NLS4BJTA/exec";
 
 let questions = [];
 let currentQuestion = 0;
 let score = 0;
 
-let timeLeft = 2400; // 40 minutes
+let timeLeft = 2400; // 40 Minutes
 let timer;
 let startTime;
 
@@ -265,7 +265,12 @@ let teacher = document.getElementById("teacher").value;
 let batch = document.getElementById("batch").value;
 let accessCode = document.getElementById("accessCode").value;
 
-if(name=="" || roll=="" || teacher=="" || batch=="" || accessCode==""){
+if(
+name==="" ||
+roll==="" ||
+teacher==="" ||
+batch==="" ||
+accessCode===""){
 alert("সব তথ্য পূরণ করুন");
 return;
 }
@@ -277,28 +282,30 @@ return;
 
 startTime = new Date();
 
-startTimer();
-
 fetch(SHEET_API)
-.then(res => res.json())
-.then(data=>{
+.then(response => response.json())
+.then(data => {
 
 questions = data;
 
-document.getElementById("studentForm").style.display="none";
-document.getElementById("examSection").style.display="block";
+document.getElementById("studentForm").style.display = "none";
+document.getElementById("examSection").style.display = "block";
+
+startTimer();
 
 loadQuestion();
 
 })
-.catch(err=>{
+.catch(error => {
+
+console.log(error);
+
 alert("Question Loading Failed");
-console.log(err);
+
 });
 
 }
-
-function startTimer(){
+  function startTimer(){
 
 timer = setInterval(()=>{
 
@@ -328,18 +335,49 @@ submitExam();
 function loadQuestion(){
 
 if(currentQuestion >= questions.length){
+
 submitExam();
+
 return;
+
 }
 
 let q = questions[currentQuestion];
 
 document.getElementById("questionNumber").innerHTML =
-"Question " + (currentQuestion+1) +
+"Question " + (currentQuestion + 1) +
 " of " + questions.length;
 
 document.getElementById("questionText").innerHTML =
 q[0];
+
+document.getElementById("optionsArea").innerHTML = `
+
+<label class="option">
+<input type="radio" name="answer" value="A">
+${q[1]}
+</label>
+
+<label class="option">
+<input type="radio" name="answer" value="B">
+${q[2]}
+</label>
+
+<label class="option">
+<input type="radio" name="answer" value="C">
+${q[3]}
+</label>
+
+<label class="option">
+<input type="radio" name="answer" value="D">
+${q[4]}
+</label>
+
+<button class="submit-btn" onclick="nextQuestion()">
+Next Question
+</button>
+
+`;
 
 const radios =
 document.querySelectorAll('input[name="answer"]');
@@ -351,7 +389,9 @@ radio.addEventListener("change", function(){
 radios.forEach(r => {
 
 if(r !== this){
+
 r.disabled = true;
+
 }
 
 });
@@ -359,6 +399,7 @@ r.disabled = true;
 });
 
 });
+
 }
 
 function nextQuestion(){
@@ -367,15 +408,20 @@ let selected =
 document.querySelector('input[name="answer"]:checked');
 
 if(!selected){
+
 alert("একটি উত্তর নির্বাচন করুন");
+
 return;
+
 }
 
 let correctAnswer =
 questions[currentQuestion][5];
 
 if(selected.value === correctAnswer){
+
 score++;
+
 }
 
 currentQuestion++;
@@ -383,22 +429,21 @@ currentQuestion++;
 loadQuestion();
 
 }
-
-function submitExam(){
+  function submitExam(){
 
 clearInterval(timer);
 
 let endTime = new Date();
 
 let usedMinutes =
-Math.floor((endTime-startTime)/60000);
+Math.floor((endTime - startTime)/60000);
 
 let finalMarks =
-let finalMarks = score;
+Math.round((score / questions.length) * 50);
 
-document.getElementById("examSection").style.display="none";
+document.getElementById("examSection").style.display = "none";
 
-document.getElementById("resultBox").style.display="block";
+document.getElementById("resultBox").style.display = "block";
 
 document.getElementById("finalScore").innerHTML =
 finalMarks + "/50" +
@@ -407,27 +452,30 @@ finalMarks + "/50" +
 
 let resultData = {
 
-name:document.getElementById("name").value,
-roll:document.getElementById("roll").value,
-teacher:document.getElementById("teacher").value,
-batch:document.getElementById("batch").value,
-timeUsed:usedMinutes,
-score:finalMarks,
-accessCode:document.getElementById("accessCode").value,
-examDate:new Date().toLocaleDateString()
+name: document.getElementById("name").value,
+roll: document.getElementById("roll").value,
+teacher: document.getElementById("teacher").value,
+batch: document.getElementById("batch").value,
+timeUsed: usedMinutes,
+score: finalMarks,
+accessCode: document.getElementById("accessCode").value,
+examDate: new Date().toLocaleDateString()
 
 };
 
 fetch(SHEET_API,{
 method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
 body:JSON.stringify(resultData)
 })
-.then(res=>res.text())
-.then(data=>console.log(data))
-.catch(err=>console.log(err));
+.then(res => res.text())
+.then(data => console.log(data))
+.catch(err => console.log(err));
 
 }
+  </script>
 
-</script>
-  </body>
+</body>
 </html>
